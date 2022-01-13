@@ -34,6 +34,7 @@ mapping-versions:
     Enterprise 7.3.1: 7.18.0.Final-redhat-00004
     Enterprise 7.3: 7.18.0.Final-redhat-00002    
   communityVersions:
+    - 7.64.0.Test
     - 7.60.0.Final
     - 7.59.0.Final
     - 7.58.0.Final
