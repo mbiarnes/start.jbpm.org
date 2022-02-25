@@ -7,8 +7,8 @@ AGENT_LABEL="kie-rhel7"
 MVN_TOOL="kie-maven-3.8.1"
 JDK_TOOL="kie-jdk11"
 startJbpmOrgRepo="start.jbpm.org"
-GIT_AUTHOR="kiegroup"
-TARGET_BRANCH="main"
+GIT_AUTHOR="mbiarnes"
+TARGET_BRANCH="fixProd"
 COMMIT_MSG="bumped up and added kie-version"
 PR_BRANCH="bump_up_version_to_${NEW_KIE_VERSION}"
 PR_BODY="Please review and merge"
@@ -65,7 +65,7 @@ pipeline {
              }
              steps {
                  // change and add version in application.yml
-                 sh 'sed -i "/enterpriseVersions:.*/a\\ \\ \\ \\ \\- ${PROD_VERSION}" start.jbpm.org/jbpm-bootstrap-service/src/main/resources/application.yml'
+                 sh 'sed -i "/enterpriseVersions:.*/a\\ \\ \\ \\ \\ ${PROD_VERSION}" start.jbpm.org/jbpm-bootstrap-service/src/main/resources/application.yml'
              }
          }
         stage('add and commit changes'){
