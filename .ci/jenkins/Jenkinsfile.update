@@ -7,11 +7,20 @@ AGENT_LABEL="kie-rhel7"
 MVN_TOOL="kie-maven-3.8.1"
 JDK_TOOL="kie-jdk11"
 startJbpmOrgRepo="start.jbpm.org"
-GIT_AUTHOR="kiegroup"
-TARGET_BRANCH="main"
+GIT_AUTHOR="mbiarnes"
+TARGET_BRANCH="fixProd"
 COMMIT_MSG="bumped up and added kie-version"
-PR_BRANCH="bump_up_version_to_${NEW_KIE_VERSION}"
 PR_BODY="Please review and merge"
+prodVersion = "${env.PROD_VERSION}"
+currentKieVersion = "${env.CURRENT_KIE_VERSION}"
+newKieVersion = "${env.NEW_KIE_VERSION}"
+
+
+if ( "${env.IS_PROD}" == "NO" ) {
+    PR_BRANCH="bump_up_version_to_${newKieVersion}"
+    } else {
+    PR_BRANCH='added_new_prod_version'
+}
 
 pipeline {
     agent {
@@ -52,22 +61,22 @@ pipeline {
             }
             steps {
                 // change and add version in application.yml
-                sh 'sed -i "0,/${CURRENT_KIE_VERSION}/{s/${CURRENT_KIE_VERSION}/${NEW_KIE_VERSION}/}" start.jbpm.org/jbpm-bootstrap-service/src/main/resources/application.yml'
-                sh 'sed -i "/communityVersions:.*/a\\ \\ \\ \\ \\- ${NEW_KIE_VERSION}" start.jbpm.org/jbpm-bootstrap-service/src/main/resources/application.yml'
+                sh 'sed -i "0,/${currentKieVersion}/{s/${currentKieVersion}/${newKieVersion}/}" start.jbpm.org/jbpm-bootstrap-service/src/main/resources/application.yml'
+                sh 'sed -i "/communityVersions:.*/a\\ \\ \\ \\ \\- ${newKieVersion}" start.jbpm.org/jbpm-bootstrap-service/src/main/resources/application.yml'
                 // change version in poms
-                sh 'sed -i "0,/<kie.version>${CURRENT_KIE_VERSION}/{s/${CURRENT_KIE_VERSION}/${NEW_KIE_VERSION}/}" start.jbpm.org/jbpm-bootstrap-kjar/pom.xml'
-                sh 'sed -i "0,/<kie.version>${CURRENT_KIE_VERSION}/{s/${CURRENT_KIE_VERSION}/${NEW_KIE_VERSION}/}" start.jbpm.org/jbpm-bootstrap-service/pom.xml'
+                sh 'sed -i "0,/<kie.version>${currentKieVersion}/{s/${currentKieVersion}/${newKieVersion}/}" start.jbpm.org/jbpm-bootstrap-kjar/pom.xml'
+                sh 'sed -i "0,/<kie.version>${currentKieVersion}/{s/${currentKieVersion}/${newKieVersion}/}" start.jbpm.org/jbpm-bootstrap-service/pom.xml'
             }
         }
-         stage('add product versions') {
-             when {
-                 expression { IS_PROD == 'YES' }
-             }
-             steps {
-                 // change and add version in application.yml
-                 sh 'sed -i "/enterpriseVersions:.*/a\\ \\ \\ \\ \\- ${PROD_VERSION}" start.jbpm.org/jbpm-bootstrap-service/src/main/resources/application.yml'
-             }
-         }
+        stage('add product versions') {
+            when {
+                expression { IS_PROD == 'YES' }
+            }
+            steps {
+                // change and add version in application.yml
+                sh 'sed -i "/enterpriseVersions:.*/a\\ \\ \\ \\ \\${prodVersion}" start.jbpm.org/jbpm-bootstrap-service/src/main/resources/application.yml'
+            }
+        }
         stage('add and commit changes'){
             steps{
                 dir("${WORKSPACE}/${startJbpmOrgRepo}"){
